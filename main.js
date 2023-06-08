@@ -18,7 +18,7 @@ function getShadeValue() {
   });
 }
 // 更新background 的缓存阴影值
-function updateBackgroundShade() {
+function updateBackgroundShade(request) {
   var port = chrome.extension.connect({ name: "updateShadeValue" });
   port.postMessage({
     detail: { name: "updateShadeValue", data: request.data },
@@ -39,7 +39,7 @@ function listenShadeUpdate() {
         "#my__custom__eye__plugin__xxx__000"
       ).style.background = `rgba(0, 0, 0, ${number})`;
 
-      updateBackgroundShade();
+      updateBackgroundShade(request);
 
       sendResponse({
         farewell: "I'm contentscript,goodbye!",
