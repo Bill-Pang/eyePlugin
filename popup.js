@@ -26,6 +26,7 @@ setTimeout(() => {
           tabs[0].id,
           { greeting: "eyePlugin", data: e.target.value },
           function (response) {
+            // console.log("response::::", response);
             brightness.textContent = response.data;
             brightnessInpt.value = response.data;
             localStorage.setItem("eyePlugin", response.data);

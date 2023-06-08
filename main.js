@@ -20,6 +20,7 @@ function getShadeValue() {
 // 更新background 的缓存阴影值
 function updateBackgroundShade(request) {
   var port = chrome.extension.connect({ name: "updateShadeValue" });
+  shadeValue = request.data;
   port.postMessage({
     detail: { name: "updateShadeValue", data: request.data },
   });
@@ -48,9 +49,22 @@ function listenShadeUpdate() {
 
       // 这里是打开poppup时,需要从background的缓存中获取最新的阴影值缓存
     } else if (request.greeting == "getShadeValue") {
+      // console.log(
+      //   "这里是打开poppup时,需要从background的缓存中获取最新的阴影值缓存"
+      // );
+      // console.log("shadeValue:", shadeValue);
       sendResponse({
         data: shadeValue,
       });
+
+      // background 主动向contentscript发送 同时同步多个网页的阴影值
+    } else if (request.greeting == "formBackground") {
+      shadeValue = request.data;
+      let number = Number(request.data) / 10;
+
+      document.querySelector(
+        "#my__custom__eye__plugin__xxx__000"
+      ).style.background = `rgba(0, 0, 0, ${number})`;
     }
   });
 }
