@@ -1,0 +1,31 @@
+{
+  "name": "护眼小助手",
+  "description": "保护你的眼睛",
+  "version": "1.0",
+  "manifest_version": 2,
+
+  "icons": {
+    "16": "img/logo.png",
+    "48": "img/logo.png",
+    "128": "img/logo.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["main.js"],
+      "css": [],
+      "run_at": "document_end"
+    }
+  ],
+
+  "background": {
+    "scripts": ["lib/axios.js", "background.js"]
+  },
+
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+
+  "permissions": ["*://*/"]
+}
