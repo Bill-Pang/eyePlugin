@@ -1,21 +1,26 @@
 console.log("%c plugIn run !!!!!!!!", "color:white;background:black");
 var shadeValue = 2;
+let timer = null;
 
 // 阴影值只存在一个 就是存在background的缓存中,不同网页都适用于这个阴影值
 
 // 从 background中获取阴影缓存值 并渲染dom
 function getShadeValue() {
-  var port = chrome.extension.connect({ name: "getShadeValue" });
-  port.postMessage({ detail: { name: "getShadeValue" } });
+  // 如果阴影dom 没有被创建 则去创建
 
-  //这里主要是为了接受回传的值
-  port.onMessage.addListener((msg) => {
-    console.log("onMessage background:", msg);
-    if (msg.shadeValue) {
-      shadeValue = msg.shadeValue;
-      renderShadeDom(msg.shadeValue / 10);
-    }
-  });
+  if (!document.querySelector("#my__custom__eye__plugin__xxx__000")) {
+    var port = chrome.extension.connect({ name: "getShadeValue" });
+    port.postMessage({ detail: { name: "getShadeValue" } });
+
+    //这里主要是为了接受回传的值
+    port.onMessage.addListener((msg) => {
+      console.log("onMessage background:", msg);
+      if (msg.shadeValue) {
+        shadeValue = msg.shadeValue;
+        renderShadeDom(msg.shadeValue / 10);
+      }
+    });
+  }
 }
 // 更新background 的缓存阴影值
 function updateBackgroundShade(request) {
@@ -89,4 +94,9 @@ function renderShadeDom(filterShadeValue) {
   listenShadeUpdate();
 }
 
-getShadeValue();
+// 每秒去更新一下 因为有些spa页面 不刷新页面 而重新渲染了页面，导致阴影层被移除了
+// 比如 baidu 搜索时，dom被重新渲染 阴影层被移除，此时就需要重新渲染
+if (timer) clearInterval(timer);
+timer = setInterval(() => {
+  getShadeValue();
+}, 1000);
