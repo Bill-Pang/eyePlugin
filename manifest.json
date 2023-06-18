@@ -15,12 +15,12 @@
       "matches": ["*://*/*"],
       "js": ["main.js"],
       "css": [],
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ],
 
   "background": {
-    "scripts": ["lib/axios.js", "background.js"]
+    "scripts": ["background.js"]
   },
 
   "browser_action": {
