@@ -96,6 +96,7 @@ function renderShadeDom(filterShadeValue) {
 
 // 每秒去更新一下 因为有些spa页面 不刷新页面 而重新渲染了页面，导致阴影层被移除了
 // 比如 baidu 搜索时，dom被重新渲染 阴影层被移除，此时就需要重新渲染
+getShadeValue();
 if (timer) clearInterval(timer);
 timer = setInterval(() => {
   getShadeValue();
