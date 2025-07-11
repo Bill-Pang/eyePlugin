@@ -1,41 +1,35 @@
-// 监听
-chrome.extension.onConnect.addListener(function (port) {
-  function getShadomValue() {
-    port.onMessage.addListener(function (data) {
-      let shadeValue = localStorage.getItem("shadeValue") || 2;
-      port.postMessage({ shadeValue });
-    });
-  }
+// background.js (MV3)
 
-  function sendShadeValueToContent() {
-    // 遍历所有已打开的tab 全部发送
-    chrome.tabs.query({}, function (tabs) {
-      // 遍历标签页数组
-      for (var i = 0; i < tabs.length; i++) {
-        // 向每个标签页的 content script 发送消息
-        chrome.tabs.sendMessage(tabs[i].id, {
-          greeting: "formBackground",
-          data: localStorage.getItem("shadeValue") || 2,
+// 监听来自 content script 或 popup 的消息
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "getShadeValue") {
+      chrome.storage.local.get(["shadeValue"], (result) => {
+        const shadeValue = result.shadeValue || 2;
+        sendResponse({ shadeValue });
+      });
+  
+      // 必须返回 true 表示异步响应
+      return true;
+    }
+  
+    if (message.type === "updateShadeValue") {
+      const newValue = message.value || 2;
+  
+      chrome.storage.local.set({ shadeValue: newValue }, () => {
+        // 通知所有 tab 更新阴影值
+        chrome.tabs.query({}, (tabs) => {
+          for (const tab of tabs) {
+            chrome.tabs.sendMessage(tab.id, {
+              greeting: "formBackground",
+              data: newValue,
+            });
+          }
         });
-      }
-    });
-  }
-
-  function updateShadeValue() {
-    port.onMessage.addListener(function (data) {
-      let shadeValue = localStorage.setItem("shadeValue", data.detail.data);
-      port.postMessage({ shadeValue });
-      // 主动向content 发送最新的阴影值 同时同步多个网页的阴影值
-      sendShadeValueToContent();
-    });
-  }
-
-  switch (port.name) {
-    case "getShadeValue":
-      getShadomValue();
-      break;
-    case "updateShadeValue":
-      updateShadeValue();
-      break;
-  }
-});
+  
+        sendResponse({ shadeValue: newValue });
+      });
+  
+      return true;
+    }
+  });
+  
