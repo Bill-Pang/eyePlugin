@@ -30,7 +30,11 @@ function updateBackgroundShade(request) {
 
 function listenShadeUpdate() {
   // 监听 popup 或 background 发来的消息
-  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  chrome.runtime.onMessage.addListener(function (
+    request,
+    sender,
+    sendResponse
+  ) {
     if (request.greeting === "eyePlugin") {
       let number = Number(request.data) / 10;
 
@@ -44,19 +48,15 @@ function listenShadeUpdate() {
         farewell: "I'm contentscript, goodbye!",
         data: request.data,
       });
-
     } else if (request.greeting === "getShadeValue") {
       sendResponse({
         data: shadeValue,
       });
-
     } else if (request.greeting === "formBackground") {
       shadeValue = request.data;
       let number = Number(request.data) / 10;
 
-      const node = document.querySelector(
-        "#my__custom__eye__plugin__xxx__000"
-      );
+      const node = document.querySelector("#my__custom__eye__plugin__xxx__000");
       if (node) {
         node.style.background = `rgba(0, 0, 0, ${number})`;
       } else {
@@ -67,6 +67,9 @@ function listenShadeUpdate() {
 }
 
 function renderShadeDom(filterShadeValue) {
+  let existing = document.querySelector("#my__custom__eye__plugin__xxx__000");
+  if (existing) return; // 防止重复插入
+
   var node = document.createElement("div");
   node.style = `
     width: 100%;
